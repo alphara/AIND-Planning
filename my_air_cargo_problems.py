@@ -37,10 +37,14 @@ class AirCargoProblem(Problem):
 
     def get_actions(self):
         """
-        This method creates concrete actions (no variables) for all actions in the problem
-        domain action schema and turns them into complete Action objects as defined in the
-        aimacode.planning module. It is computationally expensive to call this method directly;
-        however, it is called in the constructor and the results cached in the `actions_list` property.
+        This method creates concrete actions (no variables) for all actions in
+        the problem
+        domain action schema and turns them into complete Action objects as
+        defined in the
+        aimacode.planning module. It is computationally expensive to call this
+        method directly;
+        however, it is called in the constructor and the results cached in the
+        `actions_list` property.
 
         Returns:
         ----------
@@ -48,10 +52,14 @@ class AirCargoProblem(Problem):
             list of Action objects
         """
 
-        # TODO create concrete Action objects based on the domain action schema for: Load, Unload, and Fly
-        # concrete actions definition: specific literal action that does not include variables as with the schema
-        # for example, the action schema 'Load(c, p, a)' can represent the concrete actions 'Load(C1, P1, SFO)'
-        # or 'Load(C2, P2, JFK)'.  The actions for the planning problem must be concrete because the problems in
+        # DONE create concrete Action objects based on the domain action schema
+        # for: Load, Unload, and Fly
+        # concrete actions definition: specific literal action that does not
+        # include variables as with the schema
+        # for example, the action schema 'Load(c, p, a)' can represent the
+        # concrete actions 'Load(C1, P1, SFO)'
+        # or 'Load(C2, P2, JFK)'. The actions for the planning problem must be
+        # concrete because the problems in
         # forward search and Planning Graphs must use Propositional Logic
 
         def load_actions():
@@ -60,7 +68,32 @@ class AirCargoProblem(Problem):
             :return: list of Action objects
             """
             loads = []
-            # TODO create all load ground actions from the domain Load action
+            for c in self.cargos:
+                for p in self.planes:
+                    for a in self.airports:
+                        precond_pos = [expr("At({}, {})".format(c, a)),
+                                       expr("At({}, {})".format(p, a)),
+                                      ]
+                        precond_neg = []
+
+                        # We assume, could be many cargos in one plane
+                        # # There is no other cargos (co != c) in the plane p
+                        # for co in self.cargos:
+                        #     if co != c:
+                        #         precond_neg.append(expr("In({}, {})".format(co, p)))
+
+                        # If cargo in any other plane, there is no At(c, a) for
+                        # the cargo
+                        # # There is no c cargo in any planes (pa)
+                        # for pa in self.planes:
+                        #     precond_neg.append(expr("In({}, {})".format(c, pa)))
+
+                        effect_add = [expr("In({}, {})".format(c, p))]
+                        effect_rem = [expr("At({}, {})".format(c, a))]
+                        load = Action(expr("Load({}, {}, {})".format(c, p, a)),
+                                      [precond_pos, precond_neg],
+                                      [effect_add, effect_rem])
+                        loads.append(load)
             return loads
 
         def unload_actions():
@@ -69,7 +102,19 @@ class AirCargoProblem(Problem):
             :return: list of Action objects
             """
             unloads = []
-            # TODO create all Unload ground actions from the domain Unload action
+            for c in self.cargos:
+                for p in self.planes:
+                    for a in self.airports:
+                        precond_pos = [expr("In({}, {})".format(c, p)),
+                                       expr("At({}, {})".format(p, a)),
+                                      ]
+                        precond_neg = []
+                        effect_add = [expr("At({}, {})".format(c, a))]
+                        effect_rem = [expr("In({}, {})".format(c, p))]
+                        unload = Action(expr("Unload({}, {}, {})".format(c, p, a)),
+                                        [precond_pos, precond_neg],
+                                        [effect_add, effect_rem])
+                        unloads.append(unload)
             return unloads
 
         def fly_actions():
@@ -83,7 +128,7 @@ class AirCargoProblem(Problem):
                     if fr != to:
                         for p in self.planes:
                             precond_pos = [expr("At({}, {})".format(p, fr)),
-                                           ]
+                                          ]
                             precond_neg = []
                             effect_add = [expr("At({}, {})".format(p, to))]
                             effect_rem = [expr("At({}, {})".format(p, fr))]
