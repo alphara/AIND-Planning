@@ -28,11 +28,16 @@ class AirCargoProblem(Problem):
             literal fluents required for goal test
         """
         self.state_map = initial.pos + initial.neg
+        print('__INIT__ state_map:', self.state_map)
         self.initial_state_TF = encode_state(initial, self.state_map)
+        print('__INIT__ initial_state_TF:', self.initial_state_TF)
         Problem.__init__(self, self.initial_state_TF, goal=goal)
         self.cargos = cargos
+        print('__INIT__ cargos:', self.cargos)
         self.planes = planes
+        print('__INIT__ planes:', self.planes)
         self.airports = airports
+        print('__INIT__ airports:', self.airports)
         self.actions_list = self.get_actions()
 
     def get_actions(self):
@@ -148,8 +153,30 @@ class AirCargoProblem(Problem):
             e.g. 'FTTTFF'
         :return: list of Action objects
         """
-        # TODO implement
+        print('ACTIONS state:', state)
+        print('ACTIONS state_map:', self.state_map)
+        print('ACTIONS self.actions_list[]:')
+        for idx, elem in enumerate(self.actions_list):
+            print("  [{}]: {}".format(idx, self.actions_list[idx]))
+
         possible_actions = []
+        kb = PropKB()
+        kb.tell(decode_state(state, self.state_map).pos_sentence())
+        for action in self.actions_list:
+            is_possible = True
+            for clause in action.precond_pos:
+                if clause not in kb.clauses:
+                    is_possible = False
+            for clause in action.precond_neg:
+                if clause in kb.clauses:
+                    is_possible = False
+            if is_possible:
+                possible_actions.append(action)
+
+        print('ACTIONS possible_actions[]:')
+        for idx, elem in enumerate(possible_actions):
+            print("  [{}]: {}".format(idx, possible_actions[idx]))
+
         return possible_actions
 
     def result(self, state: str, action: Action):
@@ -161,6 +188,8 @@ class AirCargoProblem(Problem):
         :param action: Action applied
         :return: resulting state after action
         """
+        print('RESULT state:', state)
+        print('RESULT action:', action)
         # TODO implement
         new_state = FluentState([], [])
         return encode_state(new_state, self.state_map)
