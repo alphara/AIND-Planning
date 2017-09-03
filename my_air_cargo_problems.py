@@ -28,17 +28,18 @@ class AirCargoProblem(Problem):
             literal fluents required for goal test
         """
         self.state_map = initial.pos + initial.neg
-        print('__INIT__ state_map:', self.state_map)
         self.initial_state_TF = encode_state(initial, self.state_map)
-        print('__INIT__ initial_state_TF:', self.initial_state_TF)
         Problem.__init__(self, self.initial_state_TF, goal=goal)
         self.cargos = cargos
-        print('__INIT__ cargos:', self.cargos)
         self.planes = planes
-        print('__INIT__ planes:', self.planes)
         self.airports = airports
-        print('__INIT__ airports:', self.airports)
         self.actions_list = self.get_actions()
+
+        # print('__INIT__ state_map:', self.state_map)
+        # print('__INIT__ initial_state_TF:', self.initial_state_TF)
+        # print('__INIT__ cargos:', self.cargos)
+        # print('__INIT__ planes:', self.planes)
+        # print('__INIT__ airports:', self.airports)
 
     def get_actions(self):
         """
@@ -153,11 +154,11 @@ class AirCargoProblem(Problem):
             e.g. 'FTTTFF'
         :return: list of Action objects
         """
-        print('ACTIONS state:', state)
-        print('ACTIONS state_map:', self.state_map)
-        print('ACTIONS self.actions_list[]:')
-        for idx, elem in enumerate(self.actions_list):
-            print("  [{}]: {}".format(idx, self.actions_list[idx]))
+        # print('ACTIONS state:', state)
+        # print('ACTIONS state_map:', self.state_map)
+        # print('ACTIONS self.actions_list[]:')
+        # for idx, elem in enumerate(self.actions_list):
+        #     print("  [{}]: {}".format(idx, self.actions_list[idx]))
 
         possible_actions = []
         kb = PropKB()
@@ -173,9 +174,9 @@ class AirCargoProblem(Problem):
             if is_possible:
                 possible_actions.append(action)
 
-        print('ACTIONS possible_actions[]:')
-        for idx, elem in enumerate(possible_actions):
-            print("  [{}]: {}".format(idx, possible_actions[idx]))
+        # print('ACTIONS possible_actions[]:')
+        # for idx, elem in enumerate(possible_actions):
+        #     print("  [{}]: {}".format(idx, possible_actions[idx]))
 
         return possible_actions
 
@@ -188,10 +189,32 @@ class AirCargoProblem(Problem):
         :param action: Action applied
         :return: resulting state after action
         """
-        print('RESULT state:', state)
-        print('RESULT action:', action)
-        # TODO implement
+        # print('RESULT >')
+        # print('RESULT state:', state)
+        # print('RESULT action:', action)
+
         new_state = FluentState([], [])
+        old_state = decode_state(state, self.state_map)
+        # print('RESULT old_state.pos:', old_state.pos)
+        # print('RESULT          .neg:', old_state.neg)
+
+        for fluent in old_state.pos:
+            if fluent not in action.effect_rem:
+                new_state.pos.append(fluent)
+        for fluent in action.effect_add:
+            if fluent not in new_state.pos:
+                new_state.pos.append(fluent)
+        for fluent in old_state.neg:
+            if fluent not in action.effect_add:
+                new_state.neg.append(fluent)
+        for fluent in action.effect_rem:
+            if fluent not in new_state.neg:
+                new_state.neg.append(fluent)
+
+        # print('RESULT new_state.pos:', new_state.pos)
+        # print('RESULT          .neg:', new_state.neg)
+        # print('RESULT return:', encode_state(new_state, self.state_map))
+
         return encode_state(new_state, self.state_map)
 
     def goal_test(self, state: str) -> bool:
