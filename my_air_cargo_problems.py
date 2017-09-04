@@ -58,16 +58,6 @@ class AirCargoProblem(Problem):
             list of Action objects
         """
 
-        # DONE create concrete Action objects based on the domain action schema
-        # for: Load, Unload, and Fly
-        # concrete actions definition: specific literal action that does not
-        # include variables as with the schema
-        # for example, the action schema 'Load(c, p, a)' can represent the
-        # concrete actions 'Load(C1, P1, SFO)'
-        # or 'Load(C2, P2, JFK)'. The actions for the planning problem must be
-        # concrete because the problems in
-        # forward search and Planning Graphs must use Propositional Logic
-
         def load_actions():
             """Create all concrete Load actions and return a list
 
@@ -81,18 +71,6 @@ class AirCargoProblem(Problem):
                                        expr("At({}, {})".format(p, a)),
                                       ]
                         precond_neg = []
-
-                        # We assume, could be many cargos in one plane
-                        # # There is no other cargos (co != c) in the plane p
-                        # for co in self.cargos:
-                        #     if co != c:
-                        #         precond_neg.append(expr("In({}, {})".format(co, p)))
-
-                        # If cargo in any other plane, there is no At(c, a) for
-                        # the cargo
-                        # # There is no c cargo in any planes (pa)
-                        # for pa in self.planes:
-                        #     precond_neg.append(expr("In({}, {})".format(c, pa)))
 
                         effect_add = [expr("In({}, {})".format(c, p))]
                         effect_rem = [expr("At({}, {})".format(c, a))]
@@ -255,6 +233,8 @@ class AirCargoProblem(Problem):
         executed.
         """
         # TODO implement (see Russell-Norvig Ed-3 10.2.3  or Russell-Norvig Ed-2 11.2)
+        print ('h_ignore_preconditions node:', node)
+        node.show()
         count = 0
         return count
 
@@ -267,7 +247,7 @@ def air_cargo_p1() -> AirCargoProblem:
            expr('At(C2, JFK)'),
            expr('At(P1, SFO)'),
            expr('At(P2, JFK)'),
-           ]
+          ]
     neg = [expr('At(C2, SFO)'),
            expr('In(C2, P1)'),
            expr('In(C2, P2)'),
@@ -276,11 +256,11 @@ def air_cargo_p1() -> AirCargoProblem:
            expr('In(C1, P2)'),
            expr('At(P1, JFK)'),
            expr('At(P2, SFO)'),
-           ]
+          ]
     init = FluentState(pos, neg)
     goal = [expr('At(C1, JFK)'),
             expr('At(C2, SFO)'),
-            ]
+           ]
     return AirCargoProblem(cargos, planes, airports, init, goal)
 
 
