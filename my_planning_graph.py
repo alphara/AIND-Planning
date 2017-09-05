@@ -554,10 +554,21 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
-        print('TODO PlanningGraph.competing_needs_mutex(), node_a1:', node_a1,
-              'node_a2:', node_a2)
+        # print('PlanningGraph.competing_needs_mutex(), node_a1:', node_a1,
+        #       'node_a2:', node_a2)
+        # node_a1.show()
+        # node_a2.show()
 
-        # TODO test for Competing Needs between nodes
+        # DONE test for Competing Needs between nodes
+
+        # for a1p in node_a1.prenodes:
+        #     for a2p in node_a2.prenodes:
+        for a1p in node_a1.parents:
+            for a2p in node_a2.parents:
+                # print('  a1p:', a1p, 'a2p:', a2p)
+                if a1p.is_mutex(a2p):
+                    # print(' => True')
+                    return True
         return False
 
     def update_s_mutex(self, nodeset: set):
