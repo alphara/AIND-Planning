@@ -17,7 +17,6 @@ class PgNode():
         self.parents = set()
         self.children = set()
         self.mutex = set()
-        print('PgNode.__init__()')
 
     def is_mutex(self, other) -> bool:
         """Boolean test for mutual exclusion
@@ -27,7 +26,7 @@ class PgNode():
         :return: bool
             True if this node and the other are marked mutually exclusive (mutex)
         """
-        print('PgNode.is_mutex() other:', other)
+        # print('PgNode.is_mutex() other:', other)
         if other in self.mutex:
             return True
         return False
@@ -38,7 +37,6 @@ class PgNode():
         :return:
             print only
         """
-        print('PgNode.show()')
         print("{} parents".format(len(self.parents)))
         print("{} children".format(len(self.children)))
         print("{} mutex".format(len(self.mutex)))
@@ -76,7 +74,7 @@ class PgNode_s(PgNode):
             mutex: set of sibling S-nodes that this node has mutual exclusion
                    with; initially empty
         """
-        print('PgNode_s.__init__(), symbol:', symbol, ', is_pos:', is_pos)
+        # print('PgNode_s(), symbol:', symbol, ', is_pos:', is_pos)
         PgNode.__init__(self)
         self.symbol = symbol
         self.is_pos = is_pos
@@ -89,7 +87,6 @@ class PgNode_s(PgNode):
         :return:
             print only
         """
-        print('PgNode_s.show()')
         if self.is_pos:
             print("\n*** {}".format(self.symbol))
         else:
@@ -102,13 +99,12 @@ class PgNode_s(PgNode):
         :param other: PgNode_s
         :return: bool
         """
-        print('PgNode_s.__eq__(), other:', other)
+        # print('PgNode_s.__eq__(), other:', other)
         return (isinstance(other, self.__class__) and
                 self.is_pos == other.is_pos and
                 self.symbol == other.symbol)
 
     def __hash__(self):
-        print('PgNode_s.__hash()__')
         self.__hash = self.__hash or hash(self.symbol) ^ hash(self.is_pos)
         return self.__hash
 
@@ -123,18 +119,25 @@ class PgNode_a(PgNode):
         :param action: Action
             a ground action, i.e. this action cannot contain any variables
         Instance variables calculated:
-            An A-level will always have an S-level as its parent and an S-level as its child.
-            The preconditions and effects will become the parents and children of the A-level node
-            However, when this node is created, it is not yet connected to the graph
+            An A-level will always have an S-level as its parent and an S-level
+            as its child.
+            The preconditions and effects will become the parents and children
+            of the A-level node
+            However, when this node is created, it is not yet connected to the
+            graph
             prenodes: set of *possible* parent S-nodes
             effnodes: set of *possible* child S-nodes
-            is_persistent: bool   True if this is a persistence action, i.e. a no-op action
+            is_persistent: bool   True if this is a persistence action, i.e.
+            no-op action
         Instance variables inherited from PgNode:
-            parents: set of nodes connected to this node in previous S level; initially empty
-            children: set of nodes connected to this node in next S level; initially empty
-            mutex: set of sibling A-nodes that this node has mutual exclusion with; initially empty
+            parents: set of nodes connected to this node in previous S level;
+                     initially empty
+            children: set of nodes connected to this node in next S level;
+                      initially empty
+            mutex: set of sibling A-nodes that this node has mutual exclusion
+                   with; initially empty
         """
-        print('PgNode_a.__init__(), action:', action)
+        # print('PgNode_a(), action:', action)
         PgNode.__init__(self)
         self.action = action
         self.prenodes = self.precond_s_nodes()
@@ -149,18 +152,19 @@ class PgNode_a(PgNode):
         :return:
             print only
         """
-        print('PgNode_a.show()')
         print("\n*** {!s}".format(self.action))
         PgNode.show(self)
 
     def precond_s_nodes(self):
-        """precondition literals as S-nodes (represents possible parents for this node).
-        It is computationally expensive to call this function; it is only called by the
+        """precondition literals as S-nodes (represents possible parents for
+        this node).
+        It is computationally expensive to call this function; it is only
+        called by the
         class constructor to populate the `prenodes` attribute.
 
         :return: set of PgNode_s
         """
-        print('PgNode_a.precond_s_nodes()')
+        # print('PgNode_a.precond_s_nodes()')
         nodes = set()
         for p in self.action.precond_pos:
             nodes.add(PgNode_s(p, True))
@@ -169,13 +173,15 @@ class PgNode_a(PgNode):
         return nodes
 
     def effect_s_nodes(self):
-        """effect literals as S-nodes (represents possible children for this node).
-        It is computationally expensive to call this function; it is only called by the
+        """effect literals as S-nodes (represents possible children for this
+        node).
+        It is computationally expensive to call this function; it is only
+        called by the
         class constructor to populate the `effnodes` attribute.
 
         :return: set of PgNode_s
         """
-        print('PgNode_a.effect_s_nodes()')
+        # print('PgNode_a.effect_s_nodes()')
         nodes = set()
         for e in self.action.effect_add:
             nodes.add(PgNode_s(e, True))
@@ -189,14 +195,13 @@ class PgNode_a(PgNode):
         :param other: PgNode_a
         :return: bool
         """
-        print('PgNode_a.__eq__(), other:', other)
+        # print('PgNode_a.__eq__(), other:', other)
         return (isinstance(other, self.__class__) and
                 self.is_persistent == other.is_persistent and
                 self.action.name == other.action.name and
                 self.action.args == other.action.args)
 
     def __hash__(self):
-        print('PgNode_a.__hash__()')
         self.__hash = self.__hash or hash(self.action.name) ^ hash(self.action.args)
         return self.__hash
 
@@ -340,8 +345,7 @@ class PlanningGraph():
         :return:
             adds A nodes to the current level in self.a_levels[level]
         """
-        print('TODO PlanningGraph.add_action_level(), level:', level)
-        # TODO add action A level to the planning graph as described in the
+        # DONE add action A level to the planning graph as described in the
         # Russell-Norvig text
         # 1. determine what actions to add and create those PgNode_a objects
         # 2. connect the nodes to the previous S literal level
@@ -354,9 +358,17 @@ class PlanningGraph():
         #   action node is added, it MUST be connected to the S node instances
         #   in the appropriate s_level set.
 
-        #TODO
-        #    action =
-        #    self.a_levels[level].add(PgNode_a(action, True))
+        self.a_levels.append(set())
+        # print('--> actions:')
+        for action in self.all_actions:
+            a_node = PgNode_a(action)
+            if a_node.prenodes.issubset(self.s_levels[level]):
+                print('  ADD action:', action)
+                self.a_levels[level].add(a_node)
+                for prenode in a_node.prenodes:
+                    prenode.children.add(a_node)
+                    a_node.parents.add(prenode)
+        # print('==> len a_levels[{}]'.format(level), len(self.a_levels[level]))
 
     def add_literal_level(self, level):
         """ add an S (literal) level to the Planning Graph
@@ -443,6 +455,14 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
+        # print('TODO PlanningGraph.add_action_level(), level:', level)
+        # print('  problem:', self.problem)
+        # print('  fs:', self.fs)
+        # print('  serial:', self.serial)
+        # # print('  all_actions:', self.all_actions)
+        # print('  s_levels:', self.s_levels)
+        # print('  a_levels:', self.a_levels)
+
         print('TODO PlanningGraph.inconsistent_effects_mutex(), node_a1:', node_a1,
               ', node_a2:', node_a2)
         # TODO test for Inconsistent Effects between nodes
@@ -496,7 +516,7 @@ class PlanningGraph():
         :return:
             mutex set in each PgNode_a in the set is appropriately updated
         """
-        print('TODO PlanningGraph.update_s_mutex(), nodeset:', nodeset)
+        print('PlanningGraph.update_s_mutex(), nodeset:', nodeset)
         nodelist = list(nodeset)
         for i, n1 in enumerate(nodelist[:-1]):
             for n2 in nodelist[i + 1:]:
