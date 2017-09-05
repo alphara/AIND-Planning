@@ -232,12 +232,22 @@ class AirCargoProblem(Problem):
         conditions by ignoring the preconditions required for an action to be
         executed.
         """
-        # TODO implement (see Russell-Norvig Ed-3 10.2.3  or Russell-Norvig Ed-2 11.2)
-        print ('h_ignore_preconditions node:', node)
-        node.show()
-        count = 0
-        return count
+        # DONE implement (see Russell-Norvig Ed-3 10.2.3  or Russell-Norvig Ed-2 11.2)
+        # print ('h_ignore_preconditions node:', node)
 
+        # print('  state_map:', self.state_map)
+        # print('  node.state:', node.state)
+        fluent_state = decode_state(node.state, self.state_map)
+        # print('  fluent_state.pos:', fluent_state.pos, ', .neg:', fluent_state.neg)
+        count = 0
+        # print('  self.goal:', self.goal)
+        for symbol in self.goal:
+            # print('    symbol:', symbol)
+            if symbol not in fluent_state.pos:
+                # print('      no symbol, +=1')
+                count += 1
+        # print('  count:', count)
+        return count
 
 def air_cargo_p1() -> AirCargoProblem:
     cargos = ['C1', 'C2']
