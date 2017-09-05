@@ -650,11 +650,9 @@ class PlanningGraph():
         """
         # print('PlanningGraph.h_levelsum()')
         level_sum = 0
-
         # DONE implement
         # for each goal in the problem, determine the level cost, then add
         # them together
-
         # print('goal:', self.problem.goal)
         for goal_symbol in self.problem.goal:
             # print('  goal_symbol:', goal_symbol)
@@ -662,5 +660,6 @@ class PlanningGraph():
                 if PgNode_s(goal_symbol, True) in s_level:
                     # print('    level_sum +=', i)
                     level_sum += i
+                    break
         # print('level_sum:', level_sum)
         return level_sum
