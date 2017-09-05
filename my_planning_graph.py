@@ -380,8 +380,8 @@ class PlanningGraph():
         :return:
             adds S nodes to the current level in self.s_levels[level]
         """
-        print('TODO PlanningGraph.add_literal_level(), level:', level)
-        # TODO add literal S level to the planning graph as described in the
+        print('PlanningGraph.add_literal_level(), level:', level)
+        # DONE add literal S level to the planning graph as described in the
         # Russell-Norvig text
         # 1. determine what literals to add
         # 2. connect the nodes
@@ -394,6 +394,12 @@ class PlanningGraph():
         #   all of the new S nodes as children of all the A nodes that could
         #   produce them, and likewise add the A nodes to the
         #   parent sets of the S nodes
+        self.s_levels.append(set())
+        for a_node in self.a_levels[level-1]:
+            for effnode in a_node.effnodes:
+                effnode.parents.add(a_node)
+                a_node.children.add(effnode)
+            self.s_levels[level].update(a_node.effnodes)
 
     def update_a_mutex(self, nodeset):
         """ Determine and update sibling mutual exclusion for A-level nodes
