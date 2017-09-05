@@ -221,6 +221,19 @@ def mutexify(node1: PgNode, node2: PgNode):
     node1.mutex.add(node2)
     node2.mutex.add(node1)
 
+def is_list_intersection(list1, list2):
+    """
+    Test a pair of lists for intersection.
+    Retruning True if list1 and list2 both contain common elements, and
+    False otherwise.
+
+    :param list1: list
+    :param list2: list
+    :return: bool
+    """
+    set1 = set(list1)
+    set2 = set(list2)
+    return bool(set1.intersection(set2))
 
 class PlanningGraph():
     """
@@ -345,6 +358,8 @@ class PlanningGraph():
         :return:
             adds A nodes to the current level in self.a_levels[level]
         """
+        # print('TODO PlanningGraph.add_action_level(), level:', level)
+
         # DONE add action A level to the planning graph as described in the
         # Russell-Norvig text
         # 1. determine what actions to add and create those PgNode_a objects
@@ -381,6 +396,7 @@ class PlanningGraph():
             adds S nodes to the current level in self.s_levels[level]
         """
         print('PlanningGraph.add_literal_level(), level:', level)
+
         # DONE add literal S level to the planning graph as described in the
         # Russell-Norvig text
         # 1. determine what literals to add
@@ -461,17 +477,24 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
-        # print('TODO PlanningGraph.add_action_level(), level:', level)
-        # print('  problem:', self.problem)
-        # print('  fs:', self.fs)
-        # print('  serial:', self.serial)
-        # # print('  all_actions:', self.all_actions)
-        # print('  s_levels:', self.s_levels)
-        # print('  a_levels:', self.a_levels)
-
-        print('TODO PlanningGraph.inconsistent_effects_mutex(), node_a1:', node_a1,
-              ', node_a2:', node_a2)
-        # TODO test for Inconsistent Effects between nodes
+        # print('PlanningGraph.inconsistent_effects_mutex(), node_a1:',
+        #       node_a1, ', node_a2:', node_a2)
+        # node_a1.show()
+        # node_a2.show()
+        # print('node_a1.action.effects_add:', node_a1.action.effect_add)
+        # print('node_a1.action.effects_rem:', node_a1.action.effect_rem)
+        # print('node_a2.action.effects_add:', node_a2.action.effect_add)
+        # print('node_a2.action.effects_rem:', node_a2.action.effect_rem)
+        # DONE test for Inconsistent Effects between nodes
+        if is_list_intersection(node_a1.action.effect_add,
+                                node_a2.action.effect_rem):
+            # print(' => True 1')
+            return True
+        if is_list_intersection(node_a1.action.effect_rem,
+                                node_a2.action.effect_add):
+            # print(' => True 2')
+            return True
+        # print(' => False')
         return False
 
     def interference_mutex(self, node_a1: PgNode_a, node_a2: PgNode_a) -> bool:
@@ -569,7 +592,8 @@ class PlanningGraph():
         return False
 
     def h_levelsum(self) -> int:
-        """The sum of the level costs of the individual goals (admissible if goals independent)
+        """The sum of the level costs of the individual goals (admissible if
+        goals independent)
 
         :return: int
         """
