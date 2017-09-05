@@ -316,7 +316,7 @@ class PlanningGraph():
             builds the graph by filling s_levels[] and a_levels[] lists with
             node sets for each level
         """
-        print('PlanningGraph.create_graph()')
+        # print('PlanningGraph.create_graph()')
         # the graph should only be built during class construction
         if (len(self.s_levels) != 0) or (len(self.a_levels) != 0):
             raise Exception(
@@ -378,7 +378,7 @@ class PlanningGraph():
         for action in self.all_actions:
             a_node = PgNode_a(action)
             if a_node.prenodes.issubset(self.s_levels[level]):
-                print('  ADD action:', action)
+                # print('  ADD action:', action)
                 self.a_levels[level].add(a_node)
                 for prenode in a_node.prenodes:
                     prenode.children.add(a_node)
@@ -395,7 +395,7 @@ class PlanningGraph():
         :return:
             adds S nodes to the current level in self.s_levels[level]
         """
-        print('PlanningGraph.add_literal_level(), level:', level)
+        # print('PlanningGraph.add_literal_level(), level:', level)
 
         # DONE add literal S level to the planning graph as described in the
         # Russell-Norvig text
@@ -648,8 +648,19 @@ class PlanningGraph():
 
         :return: int
         """
-        print('TODO PlanningGraph.h_levelsum()')
+        # print('PlanningGraph.h_levelsum()')
         level_sum = 0
-        # TODO implement
-        # for each goal in the problem, determine the level cost, then add them together
+
+        # DONE implement
+        # for each goal in the problem, determine the level cost, then add
+        # them together
+
+        # print('goal:', self.problem.goal)
+        for goal_symbol in self.problem.goal:
+            # print('  goal_symbol:', goal_symbol)
+            for i, s_level in enumerate(self.s_levels):
+                if PgNode_s(goal_symbol, True) in s_level:
+                    # print('    level_sum +=', i)
+                    level_sum += i
+        # print('level_sum:', level_sum)
         return level_sum
