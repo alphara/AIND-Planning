@@ -511,9 +511,37 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
-        print('TODO PlanningGraph.interference_mutex(), node_a1:', node_a1,
-              ', node_a2:', node_a2)
-        # TODO test for Interference between nodes
+        # print('PlanningGraph.interference_mutex(), node_a1:', node_a1,
+        #       ', node_a2:', node_a2)
+        # node_a1.show()
+        # node_a2.show()
+        # print('node_a1.action.precond_pos:', node_a1.action.precond_pos)
+        # print('node_a1.action.precond_neg:', node_a1.action.precond_neg)
+        # print('node_a1.action.effect_add:', node_a1.action.effect_add)
+        # print('node_a1.action.effect_rem:', node_a1.action.effect_rem)
+        # print('node_a2.action.precond_pos:', node_a2.action.precond_pos)
+        # print('node_a2.action.precond_neg:', node_a2.action.precond_neg)
+        # print('node_a2.action.effect_add:', node_a2.action.effect_add)
+        # print('node_a2.action.effect_rem:', node_a2.action.effect_rem)
+
+        # DONE test for Interference between nodes
+        if is_list_intersection(node_a1.action.effect_add,
+                                node_a2.action.precond_neg):
+            # print(' => True a1-add <-> a2-neg')
+            return True
+        if is_list_intersection(node_a1.action.effect_rem,
+                                node_a2.action.precond_pos):
+            # print(' => True a1-rem <-> a2-pos')
+            return True
+        if is_list_intersection(node_a2.action.effect_add,
+                                node_a1.action.precond_neg):
+            # print(' => True a2-add <-> a1-neg')
+            return True
+        if is_list_intersection(node_a2.action.effect_rem,
+                                node_a1.action.precond_pos):
+            # print(' => True a2-rem <-> a1-pos')
+            return True
+        # print(' => False')
         return False
 
     def competing_needs_mutex(self, node_a1: PgNode_a, node_a2: PgNode_a) -> bool:
