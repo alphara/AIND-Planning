@@ -35,12 +35,6 @@ class AirCargoProblem(Problem):
         self.airports = airports
         self.actions_list = self.get_actions()
 
-        # print('__INIT__ state_map:', self.state_map)
-        # print('__INIT__ initial_state_TF:', self.initial_state_TF)
-        # print('__INIT__ cargos:', self.cargos)
-        # print('__INIT__ planes:', self.planes)
-        # print('__INIT__ airports:', self.airports)
-
     def get_actions(self):
         """
         This method creates concrete actions (no variables) for all actions in
@@ -132,12 +126,6 @@ class AirCargoProblem(Problem):
             e.g. 'FTTTFF'
         :return: list of Action objects
         """
-        # print('ACTIONS state:', state)
-        # print('ACTIONS state_map:', self.state_map)
-        # print('ACTIONS self.actions_list[]:')
-        # for idx, elem in enumerate(self.actions_list):
-        #     print("  [{}]: {}".format(idx, self.actions_list[idx]))
-
         possible_actions = []
         kb = PropKB()
         kb.tell(decode_state(state, self.state_map).pos_sentence())
@@ -151,11 +139,6 @@ class AirCargoProblem(Problem):
                     is_possible = False
             if is_possible:
                 possible_actions.append(action)
-
-        # print('ACTIONS possible_actions[]:')
-        # for idx, elem in enumerate(possible_actions):
-        #     print("  [{}]: {}".format(idx, possible_actions[idx]))
-
         return possible_actions
 
     def result(self, state: str, action: Action):
@@ -167,15 +150,8 @@ class AirCargoProblem(Problem):
         :param action: Action applied
         :return: resulting state after action
         """
-        # print('RESULT >')
-        # print('RESULT state:', state)
-        # print('RESULT action:', action)
-
         new_state = FluentState([], [])
         old_state = decode_state(state, self.state_map)
-        # print('RESULT old_state.pos:', old_state.pos)
-        # print('RESULT          .neg:', old_state.neg)
-
         for fluent in old_state.pos:
             if fluent not in action.effect_rem:
                 new_state.pos.append(fluent)
@@ -188,11 +164,6 @@ class AirCargoProblem(Problem):
         for fluent in action.effect_rem:
             if fluent not in new_state.neg:
                 new_state.neg.append(fluent)
-
-        # print('RESULT new_state.pos:', new_state.pos)
-        # print('RESULT          .neg:', new_state.neg)
-        # print('RESULT return:', encode_state(new_state, self.state_map))
-
         return encode_state(new_state, self.state_map)
 
     def goal_test(self, state: str) -> bool:
@@ -233,20 +204,11 @@ class AirCargoProblem(Problem):
         executed.
         """
         # DONE implement (see Russell-Norvig Ed-3 10.2.3  or Russell-Norvig Ed-2 11.2)
-        # print ('h_ignore_preconditions node:', node)
-
-        # print('  state_map:', self.state_map)
-        # print('  node.state:', node.state)
         fluent_state = decode_state(node.state, self.state_map)
-        # print('  fluent_state.pos:', fluent_state.pos, ', .neg:', fluent_state.neg)
         count = 0
-        # print('  self.goal:', self.goal)
         for symbol in self.goal:
-            # print('    symbol:', symbol)
             if symbol not in fluent_state.pos:
-                # print('      no symbol, +=1')
                 count += 1
-        # print('  count:', count)
         return count
 
 def air_cargo_p1() -> AirCargoProblem:
