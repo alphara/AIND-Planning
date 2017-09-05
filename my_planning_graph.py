@@ -17,6 +17,7 @@ class PgNode():
         self.parents = set()
         self.children = set()
         self.mutex = set()
+        print('PgNode.__init__()')
 
     def is_mutex(self, other) -> bool:
         """Boolean test for mutual exclusion
@@ -26,6 +27,7 @@ class PgNode():
         :return: bool
             True if this node and the other are marked mutually exclusive (mutex)
         """
+        print('PgNode.is_mutex() other:', other)
         if other in self.mutex:
             return True
         return False
@@ -36,6 +38,7 @@ class PgNode():
         :return:
             print only
         """
+        print('PgNode.show()')
         print("{} parents".format(len(self.parents)))
         print("{} children".format(len(self.children)))
         print("{} mutex".format(len(self.mutex)))
@@ -63,12 +66,17 @@ class PgNode_s(PgNode):
         :param is_pos: bool
         Instance variables calculated:
             literal: expr
-                    fluent in its literal form including negative operator if applicable
+                    fluent in its literal form including negative operator if
+                    applicable
         Instance variables inherited from PgNode:
-            parents: set of nodes connected to this node in previous A level; initially empty
-            children: set of nodes connected to this node in next A level; initially empty
-            mutex: set of sibling S-nodes that this node has mutual exclusion with; initially empty
+            parents: set of nodes connected to this node in previous A level;
+                     initially empty
+            children: set of nodes connected to this node in next A level;
+                      initially empty
+            mutex: set of sibling S-nodes that this node has mutual exclusion
+                   with; initially empty
         """
+        print('PgNode_s.__init__(), symbol:', symbol, ', is_pos:', is_pos)
         PgNode.__init__(self)
         self.symbol = symbol
         self.is_pos = is_pos
@@ -81,6 +89,7 @@ class PgNode_s(PgNode):
         :return:
             print only
         """
+        print('PgNode_s.show()')
         if self.is_pos:
             print("\n*** {}".format(self.symbol))
         else:
@@ -93,11 +102,13 @@ class PgNode_s(PgNode):
         :param other: PgNode_s
         :return: bool
         """
+        print('PgNode_s.__eq__(), other:', other)
         return (isinstance(other, self.__class__) and
                 self.is_pos == other.is_pos and
                 self.symbol == other.symbol)
 
     def __hash__(self):
+        print('PgNode_s.__hash()__')
         self.__hash = self.__hash or hash(self.symbol) ^ hash(self.is_pos)
         return self.__hash
 
@@ -123,6 +134,7 @@ class PgNode_a(PgNode):
             children: set of nodes connected to this node in next S level; initially empty
             mutex: set of sibling A-nodes that this node has mutual exclusion with; initially empty
         """
+        print('PgNode_a.__init__(), action:', action)
         PgNode.__init__(self)
         self.action = action
         self.prenodes = self.precond_s_nodes()
@@ -137,6 +149,7 @@ class PgNode_a(PgNode):
         :return:
             print only
         """
+        print('PgNode_a.show()')
         print("\n*** {!s}".format(self.action))
         PgNode.show(self)
 
@@ -147,6 +160,7 @@ class PgNode_a(PgNode):
 
         :return: set of PgNode_s
         """
+        print('PgNode_a.precond_s_nodes()')
         nodes = set()
         for p in self.action.precond_pos:
             nodes.add(PgNode_s(p, True))
@@ -161,6 +175,7 @@ class PgNode_a(PgNode):
 
         :return: set of PgNode_s
         """
+        print('PgNode_a.effect_s_nodes()')
         nodes = set()
         for e in self.action.effect_add:
             nodes.add(PgNode_s(e, True))
@@ -174,12 +189,14 @@ class PgNode_a(PgNode):
         :param other: PgNode_a
         :return: bool
         """
+        print('PgNode_a.__eq__(), other:', other)
         return (isinstance(other, self.__class__) and
                 self.is_persistent == other.is_persistent and
                 self.action.name == other.action.name and
                 self.action.args == other.action.args)
 
     def __hash__(self):
+        print('PgNode_a.__hash__()')
         self.__hash = self.__hash or hash(self.action.name) ^ hash(self.action.args)
         return self.__hash
 
@@ -193,6 +210,7 @@ def mutexify(node1: PgNode, node2: PgNode):
     :return:
         node mutex sets modified
     """
+    print('mutexify(), node1:', node1, ', node2:', node2)
     if type(node1) != type(node2):
         raise TypeError('Attempted to mutex two nodes of different types')
     node1.mutex.add(node2)
@@ -223,6 +241,8 @@ class PlanningGraph():
             a_levels: list of sets of PgNode_a, where each set in the list
                       represents an A-level in the planning graph
         """
+        print('PlanningGraph.__init__(), problem:', problem, ', state:', state,
+              ', serial_planning:', serial_planning)
         self.problem = problem
         self.fs = decode_state(state, problem.state_map)
         self.serial = serial_planning
@@ -252,6 +272,7 @@ class PlanningGraph():
         :param literal_list:
         :return: list of Action
         """
+        print('PlanningGraph.noop_actions(), literal_list:', literal_list)
         action_list = []
         for fluent in literal_list:
             act1 = Action(expr("Noop_pos({})".format(fluent)), ([fluent], []), ([fluent], []))
@@ -277,10 +298,12 @@ class PlanningGraph():
             builds the graph by filling s_levels[] and a_levels[] lists with
             node sets for each level
         """
+        print('PlanningGraph.create_graph()')
         # the graph should only be built during class construction
         if (len(self.s_levels) != 0) or (len(self.a_levels) != 0):
             raise Exception(
-                'Planning Graph already created; construct a new planning graph for each new state in the planning sequence')
+                'Planning Graph already created; construct a new planning ' +
+                'graph for each new state in the planning sequence')
 
         # initialize S0 to literals in initial state provided.
         leveled = False
@@ -317,6 +340,7 @@ class PlanningGraph():
         :return:
             adds A nodes to the current level in self.a_levels[level]
         """
+        print('TODO PlanningGraph.add_action_level(), level:', level)
         # TODO add action A level to the planning graph as described in the
         # Russell-Norvig text
         # 1. determine what actions to add and create those PgNode_a objects
@@ -330,6 +354,10 @@ class PlanningGraph():
         #   action node is added, it MUST be connected to the S node instances
         #   in the appropriate s_level set.
 
+        #TODO
+        #    action =
+        #    self.a_levels[level].add(PgNode_a(action, True))
+
     def add_literal_level(self, level):
         """ add an S (literal) level to the Planning Graph
 
@@ -340,6 +368,7 @@ class PlanningGraph():
         :return:
             adds S nodes to the current level in self.s_levels[level]
         """
+        print('TODO PlanningGraph.add_literal_level(), level:', level)
         # TODO add literal S level to the planning graph as described in the
         # Russell-Norvig text
         # 1. determine what literals to add
@@ -370,6 +399,7 @@ class PlanningGraph():
         :return:
             mutex set in each PgNode_a in the set is appropriately updated
         """
+        print('PlanningGraph.update_a_mutex(), nodeset:', nodeset)
         nodelist = list(nodeset)
         for i, n1 in enumerate(nodelist[:-1]):
             for n2 in nodelist[i + 1:]:
@@ -390,6 +420,8 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
+        print('PlanningGraph.serialize_actions(), node_a1:', node_a1,
+              ', node_a2:', node_a2)
         #
         if not self.serial:
             return False
@@ -411,6 +443,8 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
+        print('TODO PlanningGraph.inconsistent_effects_mutex(), node_a1:', node_a1,
+              ', node_a2:', node_a2)
         # TODO test for Inconsistent Effects between nodes
         return False
 
@@ -428,6 +462,8 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
+        print('TODO PlanningGraph.interference_mutex(), node_a1:', node_a1,
+              ', node_a2:', node_a2)
         # TODO test for Interference between nodes
         return False
 
@@ -441,6 +477,8 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
+        print('TODO PlanningGraph.competing_needs_mutex(), node_a1:', node_a1,
+              'node_a2:', node_a2)
 
         # TODO test for Competing Needs between nodes
         return False
@@ -458,6 +496,7 @@ class PlanningGraph():
         :return:
             mutex set in each PgNode_a in the set is appropriately updated
         """
+        print('TODO PlanningGraph.update_s_mutex(), nodeset:', nodeset)
         nodelist = list(nodeset)
         for i, n1 in enumerate(nodelist[:-1]):
             for n2 in nodelist[i + 1:]:
@@ -477,6 +516,8 @@ class PlanningGraph():
         :param node_s2: PgNode_s
         :return: bool
         """
+        print('TODO PlanningGraph.negation_mutex(), node_s1:', node_s1,
+              ', node_s2:', node_s2)
         # TODO test for negation between nodes
         return False
 
@@ -496,6 +537,8 @@ class PlanningGraph():
         :param node_s2: PgNode_s
         :return: bool
         """
+        print('TODO PlanningGraph.inconsistent_support_mutex(), node_s1:', node_s1,
+              ', node_s2:', node_s2)
         # TODO test for Inconsistent Support between nodes
         return False
 
@@ -504,6 +547,7 @@ class PlanningGraph():
 
         :return: int
         """
+        print('TODO PlanningGraph.h_levelsum()')
         level_sum = 0
         # TODO implement
         # for each goal in the problem, determine the level cost, then add them together
