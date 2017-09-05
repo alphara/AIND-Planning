@@ -215,7 +215,7 @@ def mutexify(node1: PgNode, node2: PgNode):
     :return:
         node mutex sets modified
     """
-    print('mutexify(), node1:', node1, ', node2:', node2)
+    # print('mutexify(), node1:', node1, ', node2:', node2)
     if type(node1) != type(node2):
         raise TypeError('Attempted to mutex two nodes of different types')
     node1.mutex.add(node2)
@@ -259,8 +259,8 @@ class PlanningGraph():
             a_levels: list of sets of PgNode_a, where each set in the list
                       represents an A-level in the planning graph
         """
-        print('PlanningGraph.__init__(), problem:', problem, ', state:', state,
-              ', serial_planning:', serial_planning)
+        # print('PlanningGraph.__init__(), problem:', problem, ', state:', state,
+        #       ', serial_planning:', serial_planning)
         self.problem = problem
         self.fs = decode_state(state, problem.state_map)
         self.serial = serial_planning
@@ -290,7 +290,7 @@ class PlanningGraph():
         :param literal_list:
         :return: list of Action
         """
-        print('PlanningGraph.noop_actions(), literal_list:', literal_list)
+        # print('PlanningGraph.noop_actions(), literal_list:', literal_list)
         action_list = []
         for fluent in literal_list:
             act1 = Action(expr("Noop_pos({})".format(fluent)), ([fluent], []), ([fluent], []))
@@ -433,7 +433,7 @@ class PlanningGraph():
         :return:
             mutex set in each PgNode_a in the set is appropriately updated
         """
-        print('PlanningGraph.update_a_mutex(), nodeset:', nodeset)
+        # print('PlanningGraph.update_a_mutex(), nodeset:', nodeset)
         nodelist = list(nodeset)
         for i, n1 in enumerate(nodelist[:-1]):
             for n2 in nodelist[i + 1:]:
@@ -454,8 +454,8 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
-        print('PlanningGraph.serialize_actions(), node_a1:', node_a1,
-              ', node_a2:', node_a2)
+        # print('PlanningGraph.serialize_actions(), node_a1:', node_a1,
+        #       ', node_a2:', node_a2)
         #
         if not self.serial:
             return False
@@ -584,7 +584,7 @@ class PlanningGraph():
         :return:
             mutex set in each PgNode_a in the set is appropriately updated
         """
-        print('PlanningGraph.update_s_mutex(), nodeset:', nodeset)
+        # print('PlanningGraph.update_s_mutex(), nodeset:', nodeset)
         nodelist = list(nodeset)
         for i, n1 in enumerate(nodelist[:-1]):
             for n2 in nodelist[i + 1:]:
@@ -604,9 +604,15 @@ class PlanningGraph():
         :param node_s2: PgNode_s
         :return: bool
         """
-        print('TODO PlanningGraph.negation_mutex(), node_s1:', node_s1,
-              ', node_s2:', node_s2)
-        # TODO test for negation between nodes
+        # print('PlanningGraph.negation_mutex(), node_s1:', node_s1,
+        #       ', node_s2:', node_s2)
+        # print('node_s1.symbol:', node_s1.symbol, ', is_pos:', node_s1.is_pos)
+        # print('node_s2.symbol:', node_s2.symbol, ', is_pos:', node_s2.is_pos)
+
+        # DONE test for negation between nodes
+        if node_s1.symbol == node_s2.symbol and node_s1.is_pos != node_s2.is_pos:
+             # print(' => True')
+             return True
         return False
 
     def inconsistent_support_mutex(self, node_s1: PgNode_s, node_s2: PgNode_s):
@@ -625,10 +631,9 @@ class PlanningGraph():
         :param node_s2: PgNode_s
         :return: bool
         """
-        print('TODO PlanningGraph.inconsistent_support_mutex(), node_s1:', node_s1,
-              ', node_s2:', node_s2)
+        # print('PlanningGraph.inconsistent_support_mutex(), node_s1:',
+        #       node_s1, ', node_s2:', node_s2)
         # TODO test for Inconsistent Support between nodes
-        return False
 
     def h_levelsum(self) -> int:
         """The sum of the level costs of the individual goals (admissible if
