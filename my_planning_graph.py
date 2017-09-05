@@ -633,7 +633,14 @@ class PlanningGraph():
         """
         # print('PlanningGraph.inconsistent_support_mutex(), node_s1:',
         #       node_s1, ', node_s2:', node_s2)
-        # TODO test for Inconsistent Support between nodes
+        # DONE test for Inconsistent Support between nodes
+        for s1p in node_s1.parents:
+            for s2p in node_s2.parents:
+                # print('  s1p:', s1p, 's2p:', s2p)
+                if not s1p.is_mutex(s2p):
+                    # print(' => False')
+                    return False
+        return True
 
     def h_levelsum(self) -> int:
         """The sum of the level costs of the individual goals (admissible if
